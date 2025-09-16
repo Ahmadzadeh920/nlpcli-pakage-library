@@ -11,26 +11,24 @@ homepage = "https://github.com/Ahmadzadeh920/nlpcli-pakage-library"
 repository = "https://github.com/Ahmadzadeh920/nlpcli-pakage-library"
 keywords = ["cli", "nlp", "text", "utilities"]
 packages = [{include = "nlpcli", from = "src"}]
+requires-python = ">=3.10"
 
+dependencies = [
+    "click",
+    "colorama",
+    "textblob",
+    "pyfiglet",
+    "spacy",
+    "setuptools",
+    "click-config-file",
+    "click-params",
+    "pandas",
+    "click-help-colors",
+    "rich",
+    "commonmark"
+]
 
-
-[tool.poetry.dependencies]
-python = ">=3.10"
-click = "*"
-colorama = "*"
-textblob = "*"
-pyfiglet = "*"
-spacy = "*"
-setuptools = "*"
-click-config-file = "*"
-click-params = "*"
-pandas = "*"
-click-help-colors = "*"
-rich = "*"
-commonmark = "*"
-
-
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "*"
 black = "*"
 isort = "*"
@@ -40,6 +38,6 @@ requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 
-[tool.poetry.scripts]
+[project.scripts]
 nlpcli-download = "nlpcli.setup:download_resources"
 nlpcli = "nlpcli.cli:main"

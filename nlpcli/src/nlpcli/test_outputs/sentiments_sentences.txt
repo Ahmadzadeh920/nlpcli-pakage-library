@@ -1,0 +1,8 @@
+sentence |polarity|Subjectivity 
+Click.prompt,|0.0|0.0
+click.prompt is a function in Click, not a decorator,|0.0|0.0
+It allows you to ask the user for input interactively anywhere in your code, not just as part of an option or argument,|0.0|0.0
+click.command() @click.group() : A group is a CLI that contains multiple subcommands,|0.0|0.0
+A group is a CLI that contains multiple subcommands,|0.0|0.0
+click.group(invoke_without_command=True) means run this function even if the user doesnt specify a subcommand,|0.35|0.65
+group.command() : Defines a subcommand within the group|0.0|0.0

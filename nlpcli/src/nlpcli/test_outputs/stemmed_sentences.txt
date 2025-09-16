@@ -1,0 +1,7 @@
+clickprompt
+clickprompt is a function in click not a decor
+it allow you to ask the user for input interact anywher in your code not just as part of an option or argument
+clickcommand clickgroup a group is a cli that contain multipl subcommand
+a group is a cli that contain multipl subcommand
+clickgroupinvokewithoutcommandtru mean run thi function even if the user doe nt specifi a subcommand
+groupcommand defin a subcommand within the group

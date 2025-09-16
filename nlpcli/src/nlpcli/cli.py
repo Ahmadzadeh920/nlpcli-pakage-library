@@ -6,6 +6,14 @@ import pyfiglet
 import click_config_file
 import click_params as cp
 import ast  # to safely parse the list from the file
+from click_help_colors import HelpColorsGroup , HelpColorsCommand
+import pandas as pd
+from .services import (read_input_file,
+                        remove_stopwords_from_sentence, 
+                        normalized_sentences,
+                        stem_sentences,
+                        get_sentiment,
+                        )
 
 
 
@@ -13,19 +21,14 @@ import ast  # to safely parse the list from the file
 DEFAULT_CONFIG = os.path.join(os.path.dirname(__file__), "config.ini")
 
 
-# Try to load spaCy's small English model once, at import time.
-# We'll gracefully warn the user if it's missing at runtime.
-try:
-    nlp = spacy.load("en_core_web_sm")
-except Exception:
-    nlp = None
 
 
-
+# -----------------------------
+# CLI Main Function
+# -----------------------------
 
 @click.version_option(version='1.0.0', prog_name='NLP CLI')
-
-@click.group(invoke_without_command=True)
+@click.group(invoke_without_command=True,cls = HelpColorsGroup , help_headers_color='yellow', help_options_color='green')
 @click.argument('input_file',
     type=click.File('r'),  
     required=True) 
@@ -34,155 +37,189 @@ except Exception:
 def main(ctx, input_file):
    
     """
-    NLP Command Line Interface.
-
-    Reads the input file once, stores its contents in Click's context (ctx.obj),
-    and makes it available to all subcommands.
+    Read comments from INPUT_FILE (.csv or .txt).
+    Store all sentences in ctx.obj["sentences"] 
+    and filename in ctx.obj["file_name"].
     """
-    text = input_file.read()
-    try:
-        # Safely parse list of sentences/paragraphs
-        sentences_list = ast.literal_eval(text)
-        if not isinstance(sentences_list, list):
-            raise ValueError("The file must contain a Python list. this list must contain comments on your post")
-    except Exception as e:
-        raise click.ClickException(f"Invalid file format: {e}")
-
-    # ctx.ensure_object(dict) makes sure it exists and is a dict.
     ctx.ensure_object(dict)
-    # Initialize ctx.obj as a dict and stash our text + filename
-    ctx.obj["sentences"] = sentences_list
+    sentences = read_input_file(input_file)
+    if not sentences:
+        raise click.ClickException("No valid sentences found in the input file.")
+    ctx.obj["sentences"] = sentences
     ctx.obj["file_name"] = input_file.name
-    click.secho(f"process this file {input_file.name}" , fg ="green")
-    # If no subcommand was given, print help so the user sees available commands
-    if ctx.invoked_subcommand is None:
-        click.echo()
-        click.echo(ctx.get_help())
+    click.secho(f"Loaded {len(sentences)} sentences from {input_file.name}", fg="cyan")
 
 
+# -----------------------------
+# Subcommand: Remove stopwords
+# -----------------------------
 
-
-@main.command()
+@main.command("remove_stop_words", help_headers_color='blue', help_options_color='green')
 @click.pass_context
-@click_config_file.configuration_option(default=DEFAULT_CONFIG)
-def tokenize(ctx):
+def remove_stop_words(ctx): 
     """
-    Tokenize each sentence in the input list and print tokens.
-    Uses spaCy when available, otherwise falls back to TextBlob.
+    Remove stopwords from the list of sentences using spaCy or TextBlob.
     """
     sentences = ctx.obj.get("sentences", [])
     if not sentences:
-        click.secho("No sentences found to tokenize.", fg="yellow")
+        click.secho("No sentences found to process.", fg="yellow")
         return
 
-    all_tokens = []
+    cleaned = remove_stopwords_from_sentence(sentences)
+    click.secho("Stopwords removed. Example output:" , fg="green")
+    click.echo(f"Original: {sentences[0:2]}")
+    click.echo(f"Cleaned : {cleaned[0:2]}")
 
-    for sentence in sentences:
-        if nlp is not None:
-            doc = nlp(sentence)
-            tokens = [t.text for t in doc if not t.is_space]
+     # Prompt to save cleaned sentences
+
+    save =click.prompt("Do you want to save all cleaned sentences? (yes/no)" , type=str, default="no") 
+    if save.lower() in ("yes", "y"):
+        path = click.prompt("Enter output file path", type=str,)
+        if not os.path.isdir(path):
+            raise click.ClickException("The specified path is not a valid directory.")
+            
+
+        elif os.path.isfile(path):
+            raise click.ClickException("The specified path is a file. Please provide a directory path.")
+
         else:
-            # Fallback: TextBlob's word tokenizer
-            tokens = list(TextBlob(sentence).words)
-
-        all_tokens.extend(tokens)
-
-    click.secho(f"Total tokens: {len(all_tokens)}", fg="cyan")
-    click.secho(f"Tokens: {all_tokens}")
-
-
-@main.command()
-@click.pass_context
-def sentiment(ctx):
-    """
-    Analyze overall sentiment of a list of sentences with TextBlob.
-    Prints average polarity (-1..1) and subjectivity (0..1) + a simple label.
-    """
-    sentences = ctx.obj.get("sentences", [])
-    if not sentences:
-        click.secho("No sentences found to analyze.", fg="yellow")
-        return
-
-    total_polarity = 0.0
-    total_subjectivity = 0.0
-
-    for sentence in sentences:
-        blob = TextBlob(sentence)
-        total_polarity += blob.sentiment.polarity
-        total_subjectivity += blob.sentiment.subjectivity
-
-    # Average over all sentences
-    n = len(sentences)
-    avg_polarity = total_polarity / n
-    avg_subjectivity = total_subjectivity / n
-
-    # Simple labeling rule-of-thumb
-    if avg_polarity > 0.1:
-        label = "positive"
-        color = "green"
-    elif avg_polarity < -0.1:
-        label = "negative"
-        color = "red"
+            with open(os.path.join(path, "cleaned_sentences.txt"), 'w', encoding="utf-8") as f:
+                for sent in cleaned:
+                    f.write(sent + "\n")
+            click.secho(f"Cleaned sentences saved to {os.path.join(path, 'cleaned_sentences.txt')}", fg="green")
     else:
-        label = "neutral"
-        color = "yellow"
-
-    click.secho(f"Sentiment: {label}", fg=color)
-    click.echo(f"Average Polarity: {avg_polarity:.3f}")
-    click.echo(f"Average Subjectivity: {avg_subjectivity:.3f}")
+        click.secho("Cleaned sentences not saved.", fg="yellow")          
 
 
 
-@main.command()
-@click.option(
-    "--no-positions", is_flag=True, help="Hide start/end character offsets."
-)
+# -----------------------------
+# Subcommand: Normalize sentences
+# -----------------------------
+
+@main.command("normalize" ,  help_headers_color='blue', help_options_color='green')
 @click.pass_context
-def entity(ctx, no_positions):
-    """Recognize named entities in a list of sentences"""
-    if nlp is None:
-        raise click.ClickException(
-            "spaCy model 'en_core_web_sm' is not installed.\n"
-            "Install it with: python -m spacy download en_core_web_sm"
-        )
-
-    sentences = ctx.obj.get("sentences", [])
-    if not sentences:
-        click.secho("No sentences found to analyze.", fg="yellow")
+def normalize(ctx):
+    """
+    Normalize loaded sentences using spaCy and TextBlob
+    """
+    
+    if "sentences" not in ctx.obj:
+        click.echo("No sentences loaded. Please provide an input file first.")
         return
 
-    all_ents = []
+    sentences = ctx.obj["sentences"]
+ 
+    cleaned_sentences = normalized_sentences(sentences)
+    click.echo("Normalization completed. Example output:")
+    click.echo(f"Original: {sentences[0]}")
+    click.echo(f"Normalized: {cleaned_sentences[0]}")
+    # Prompt to save normalized sentences
 
-    # Process each sentence and collect entities
-    for sentence in sentences:
-        doc = nlp(sentence)
-        for ent in doc.ents:
-            all_ents.append(ent)
+    save = click.prompt("Do you want to save all normalized sentences? (yes/no)", type=str, default="no")
 
-    if not all_ents:
-        click.secho("No named entities found.", fg="yellow")
-        return
+    if save.lower() in ("yes", "y"):
+        path = click.prompt("Enter output file path", type=str,)
+        if not os.path.isdir(path):
+            raise click.ClickException("The specified path is not a valid directory.")
+            
+        elif os.path.isfile(path):
+            raise click.ClickException("The specified path is a file. Please provide a directory path.")
 
-    # Header
-    if no_positions:
-        click.echo(f"{'ENTITY':40}  {'LABEL':10}")
-        click.echo(f"{'-'*40}  {'-'*10}")
-    else:
-        click.echo(f"{'ENTITY':40}  {'LABEL':10}  {'SPAN':12}")
-        click.echo(f"{'-'*40}  {'-'*10}  {'-'*12}")
-
-    # Display all entities
-    for ent in all_ents:
-        entity_text = ent.text.replace("\n", " ")
-        if no_positions:
-            click.echo(f"{entity_text[:40]:40}  {ent.label_:10}")
+    
         else:
-            span = f"{ent.start_char}-{ent.end_char}"
-            click.echo(f"{entity_text[:40]:40}  {ent.label_:10}  {span:12}")
+            with open(os.path.join(path, "normalized_sentences.txt"), 'w', encoding="utf-8") as f: 
+                for sent in cleaned_sentences:
+                    f.write(sent + "\n")
+            click.secho(f"normalized sentences saved to {os.path.join(path, 'normalized_sentences.txt')}", fg="green")
+    else:
+        click.secho("Cleaned sentences not saved.", fg="yellow")          
+
+
+# -----------------------------
+# Subcommand: Stem sentences
+# -----------------------------
+
+@main.command("stem" ,  help_headers_color='blue', help_options_color='green')
+@click.pass_context
+def stem(ctx):
+    """
+    Stem loaded sentences using TextBlob and spaCy
+    """
+    sentences = ctx.obj.get("sentences", [])
+    if not sentences:
+        click.echo("No sentences loaded. Please provide an input file first.")
+        return
+ 
+    stem_sentence = stem_sentences(sentences)
+    click.echo("Normalization completed. Example output:")
+    click.echo(f"Original: {sentences[0]}")
+    click.echo(f"stemmed: {stem_sentence[0]}")
+    # Prompt to save stem_of  sentences
+
+    save = click.prompt("Do you want to save all stem of sentences? (yes/no)", type=str, default="no")
+
+    if save.lower() in ("yes", "y"):
+        path = click.prompt("Enter output file path", type=str,)
+        if not os.path.isdir(path):
+            raise click.ClickException("The specified path is not a valid directory.")
+            
+        elif os.path.isfile(path):
+            raise click.ClickException("The specified path is a file. Please provide a directory path.")
+
+    
+        else:
+            with open(os.path.join(path, "stemmed_sentences.txt"), 'w', encoding="utf-8") as f: 
+                for sent in stem_sentence:
+                    f.write(sent + "\n")
+            click.secho(f"stemmed sentences saved to {os.path.join(path, 'normalized_sentences.txt')}", fg="green")
+    else:
+        click.secho("The stem of sentences not saved.", fg="yellow")          
+
+
+
+
+@main.command('sentiment',  help_headers_color='blue', help_options_color='green')
+@click.pass_context
+def sentiments(ctx):
+    """
+    Compute sentiment of each sentence using TextBlob
+    """
+    
+    sentences = ctx.obj.get("sentences", [])
+    if not sentences:
+        click.echo("No sentences loaded. Please provide an input file first.")
+        return
+
+    sentiments = get_sentiment(sentences)
+    click.echo("Sentiment analysis completed. Example output:")
+    click.echo(f"Sentence: {sentiments[0]['sentence']}")
+    click.echo(f"Polarity: {sentiments[0]['polarity']:.3f}, Subjectivity: {sentiments[0]['subjectivity']:.3f}")
+    # Prompt to save ssetiments
+
+    save = click.prompt("Do you want to save all sentiment results? (yes/no)", type=str, default="no")
+
+    if save.lower() in ("yes", "y"):
+        path = click.prompt("Enter output file path", type=str,)
+        if not os.path.isdir(path):
+            raise click.ClickException("The specified path is not a valid directory.")
+            
+        elif os.path.isfile(path):
+            raise click.ClickException("The specified path is a file. Please provide a directory path.")
+
+    
+        else:
+            with open(os.path.join(path, "sentiments_sentences.txt"), 'w', encoding="utf-8") as f: 
+                f.write("sentence |polarity|Subjectivity "+ "\n")
+                for sent in sentiments:
+                    f.write(sent["sentence"] +"|"+str(sent["polarity"])+"|"+str(sent["subjectivity"])+"\n")
+            click.secho(f"sentiments of sentences saved to {os.path.join(path, 'sentiments_sentences.txt')}", fg="green")
+    else:
+        click.secho("The sentiments of sentences not saved.", fg="yellow")          
+
 
 
 
 
 
 if __name__ =="__main__":
-    main()
+    main(obj={})

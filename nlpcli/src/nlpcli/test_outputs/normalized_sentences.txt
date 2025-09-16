@@ -1,0 +1,7 @@
+clickprompt
+clickprompt be a function in click not a decoration
+it allow you to ask the user for input interactive anywhere in your code not just as part of an option or argument
+clickcommand clickgroup a group be a coli that contain multiple subcommand
+a group be a coli that contain multiple subcommand
+clickgroupinvokewithoutcommandtrue mean run this function even if the user do not specify a subcommand
+groupcommand define a subcommand within the group
