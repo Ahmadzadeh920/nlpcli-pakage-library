@@ -1,0 +1,9 @@
+
+    "Click.prompt",
+    "click.prompt is a function in Click, not a decorator",
+    "It allows you to ask the user for input interactively anywhere in your code, not just as part of an option or argument",
+    "click.command() @click.group() : A group is a CLI that contains multiple subcommands",
+    "A group is a CLI that contains multiple subcommands",
+    "click.group(invoke_without_command=True) means run this function even if the user doesnt specify a subcommand",
+    "group.command() : Defines a subcommand within the group"
+
