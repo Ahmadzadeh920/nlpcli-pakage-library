@@ -26,7 +26,7 @@ def read_input_file(input_file):
         with open(file_name, 'r' , encoding = "utf-8") as f:
             sentense  = [line.strip() for line in f if line.strip()]
     
-    elif file_name.endwith('.csv'):
+    elif file_name.endswith('.csv'):
         df = pd.read_csv(file_name)
         sentense = df["comments"].dropna().tolist()
     else:

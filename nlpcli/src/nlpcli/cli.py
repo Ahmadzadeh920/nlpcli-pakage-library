@@ -16,7 +16,7 @@ from .services import (read_input_file,
                         )
 
 
-
+print(os.path.dirname(__file__))
 
 DEFAULT_CONFIG = os.path.join(os.path.dirname(__file__), "config.ini")
 

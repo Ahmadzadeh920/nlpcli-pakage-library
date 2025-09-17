@@ -30,6 +30,10 @@ Install from PyPI (after publishing):
 ```bash
 pip install nlpcli
 ```
+Then, download the required NLP resources (must be done once before first use):
+``` bash
+nlpcli-download
+```
 Or install from source:
 
 ```bash
@@ -41,6 +45,15 @@ pip install .
 ## ⚡ Usage
 
 The CLI tool is available as nlpcli once installed.
+
+
+Note: Before using nlpcli for the first time, you must download the necessary NLP models and resources. Run:
+
+```bash
+  nlpcli-download
+
+```
+
 Run it with an input file (.csv or .txt):
 ```bash
 nlpcli input.txt
@@ -124,7 +137,7 @@ poetry install
 Run tests:
 
 ```bash
-pytest
+poetry run pytest
 ```
 
 ---
