@@ -163,7 +163,7 @@ This project is licensed under the MIT License
 
 **Fatemeh Ahmadzadeh**  
 - 📧 Email: [ahmadzade920@gmail.com](mailto:ahmadzade920@gmail.com)  
-- 🌐 GitHub: [@Ahmadzadeh920](ahmadzadeh920.github.io)  
+- 🌐 GitHub: [ahmadzadeh920.github.io](https://ahmadzadeh920.github.io/)  
 - 💼 LinkedIn: [Fatemeh Ahmadzadeh](https://www.linkedin.com/in/f-ahmadz/)  
 
 
