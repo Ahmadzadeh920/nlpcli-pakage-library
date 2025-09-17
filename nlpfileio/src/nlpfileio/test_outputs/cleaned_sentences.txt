@@ -1,0 +1,7 @@
+Click.prompt
+click.prompt function Click decorator
+allows ask user input interactively code option argument
+click.command @click.group group CLI contains multiple subcommands
+group CLI contains multiple subcommands
+click.group(invoke_without_command True means run function user nt specify subcommand
+group.command Defines subcommand group

@@ -1,5 +1,5 @@
 [project]
-name = "nlpcli"
+name = "nlpfileio"
 version = "0.1.0"
 description ="An open-source Python library for CLI and NLP tasks"
 authors = [
@@ -39,5 +39,5 @@ build-backend = "poetry.core.masonry.api"
 
 
 [project.scripts]
-nlpcli-download = "nlpcli.setup:download_resources"
-nlpcli = "nlpcli.cli:main"
+nlpfileio-download = "nlpfileio.setup:download_resources"
+nlpfileio = "nlpfileio.cli:main"

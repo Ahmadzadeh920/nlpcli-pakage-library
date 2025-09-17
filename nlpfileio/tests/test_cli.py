@@ -1,6 +1,6 @@
 import os
 import click
-from nlpcli.cli import main
+from nlpfileio.cli import main
 import pytest
 from click.testing import CliRunner
 import tempfile

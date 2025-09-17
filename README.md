@@ -1,13 +1,10 @@
-# nlpcli
+# nlpfileio
 
-[![PyPI version](https://img.shields.io/pypi/v/nlpcli.svg)](https://pypi.org/project/nlpcli/)
-[![Python Version](https://img.shields.io/pypi/pyversions/nlpcli.svg)](https://pypi.org/project/nlpcli/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/Ahmadzadeh920/nlpcli-pakage-library/tests.yml?branch=main)](https://github.com/Ahmadzadeh920/nlpcli-pakage-library/actions)
+
 
 **An open-source Python CLI tool for NLP tasks**
 
-`nlpcli` is a command-line interface library that simplifies natural language processing (NLP) tasks such as removing stopwords, normalizing text, stemming, and sentiment analysis.  
+`nlpfileio` is a command-line interface library that simplifies natural language processing (NLP) tasks such as removing stopwords, normalizing text, stemming, and sentiment analysis.  
 It is built with [Click](https://click.palletsprojects.com/) and provides an interactive, colorful CLI with configuration support.
 
 ---
@@ -28,11 +25,11 @@ It is built with [Click](https://click.palletsprojects.com/) and provides an int
 Install from PyPI (after publishing):
 
 ```bash
-pip install nlpcli
+pip install nlpfileio
 ```
 Then, download the required NLP resources (must be done once before first use):
 ``` bash
-nlpcli-download
+nlpfileio-download
 ```
 Or install from source:
 
@@ -44,45 +41,45 @@ pip install .
 ---
 ## ⚡ Usage
 
-The CLI tool is available as nlpcli once installed.
+The CLI tool is available as nlpfileio once installed.
 
 
-Note: Before using nlpcli for the first time, you must download the necessary NLP models and resources. Run:
+Note: Before using nlpfileio for the first time, you must download the necessary NLP models and resources. Run:
 
 ```bash
-  nlpcli-download
+  nlpfileio-download
 
 ```
 
 Run it with an input file (.csv or .txt):
 ```bash
-nlpcli input.txt
+nlpfileio input.txt
 ```
 
 ---
 ## 🛠 Commands
 ### 1. Remove Stopwords
 ```bash
-nlpcli input.txt remove_stop_words
+nlpfileio input.txt remove_stop_words
 ```
 Removes stopwords and shows an example. Optionally save results.
 
 ### 2. Normalize Sentences
 
 ```bash
-nlpcli input.txt normalize
+nlpfileio input.txt normalize
 ```
 Normalizes text and saves to normalized_sentences.txt if desired.
 
 ### 3. Stem Sentences
 ```bash
-nlpcli input.txt stem
+nlpfileio input.txt stem
 ```
 Applies stemming. Example and optional file export included.
 
 ### 4. Sentiment Analysis
 ```bash
-nlpcli input.txt sentiment
+nlpfileio input.txt sentiment
 ```
 Computes sentiment for each sentence:
 
@@ -97,8 +94,8 @@ Exports results to sentiments_sentences.txt if selected.
 ## 📂 Project Structure
 ```bash
 
-nlpcli/
-├── src/nlpcli/
+nlpfileio/
+├── src/nlpclinlpfileio/
 │   ├── cli.py          # CLI entry point
 │   ├── services.py     # Core NLP functions
 │   ├── config.ini      # Default configuration
