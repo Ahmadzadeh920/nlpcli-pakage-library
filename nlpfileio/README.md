@@ -1,6 +1,8 @@
 # nlpfileio
 
-<img src="https://github.com/Ahmadzadeh920/nlpcli-pakage-library/blob/main/nlpfileio/demo.gif" width="500" alt="Demo gif">
+<p align="center">
+  <img src="demo.gif" width="300" alt="Demo nlpfileio gif">
+</p>
 
 
 **An open-source Python CLI tool for NLP tasks**
