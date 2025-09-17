@@ -1,7 +1,7 @@
 # nlpfileio
 
 <p align="center">
-  <img src="demo.gif" width="300" alt="Demo nlpfileio gif">
+  <img src="demo.gif" width="500" alt="Demo nlpfileio gif">
 </p>
 
 
