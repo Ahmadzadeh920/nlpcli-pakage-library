@@ -1,6 +1,6 @@
 # nlpfileio
 
-![Demo](https://github.com/Ahmadzadeh920/nlpcli-pakage-library/blob/main/nlpfileio/demo.gif)
+<img src="https://github.com/Ahmadzadeh920/nlpcli-pakage-library/blob/main/nlpfileio/demo.gif" width="500" alt="Demo gif">
 
 
 **An open-source Python CLI tool for NLP tasks**
