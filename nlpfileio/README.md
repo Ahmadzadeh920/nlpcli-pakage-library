@@ -1,4 +1,6 @@
 # nlpfileio
+Check out [nlpfileio](https://pypi.org/project/nlpfileio/), a Python library for file I/O operations in NLP workflows.
+
 
 <p align="center">
   <img src="demo.gif" width="500" alt="Demo nlpfileio gif">
